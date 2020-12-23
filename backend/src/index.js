@@ -3,9 +3,9 @@ const cors = require('cors');
 const { uuid, isUuid } = require('uuidv4')
 
 const app = express()
-
 app.use(cors());
 app.use(express.json())
+
 
 const projects = []
 
@@ -17,7 +17,12 @@ function logRequests(req, res, next){
 
     const logLabel = `[${method.toUpperCase()}] ${url}`;
 
-    return next();
+    console.time(logLabel)
+
+    next();
+    
+    console.timeEnd(logLabel)
+     
 
 }
 
@@ -32,7 +37,7 @@ function validateProjectId(req,res, next){
 }
 
 app.use(logRequests);
-app.use('/projects/:id',validateProjectId);
+app.use('/projects/:id',logRequests,validateProjectId);
 
 app.get('/projects', (req, res) => {
     const { title } = req.query
@@ -78,7 +83,7 @@ app.put('/projects/:id', (req, res) => {
 
 })
 
-app.delete('/projects/:id',(req, res) => {
+app.delete('/projects/:id', (req, res) => {
     const { id } = req.params
 
     const projectIndex = projects.findIndex(project => project.id == id)
